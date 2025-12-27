@@ -27,16 +27,38 @@ from .slm_generator import (
     SanTOKSLM,
 )
 
+from .tiny_transformer import (
+    TinyTransformer,
+    TransformerConfig,
+    create_tiny_transformer,
+)
+
+from .slm_constrained_decoder import (
+    ConstrainedDecoder,
+    DecoderConfig,
+    TransformerConstrainedSLM,
+    create_transformer_slm,
+)
+
 __all__ = [
     # Constraints
     'TokenConstraint',
     'FactConstraint',
     'VocabularyScope',
     'ConstraintEngine',
-    # Generator
+    # Phase 1 Generator
     'ConstrainedGenerator',
     'GenerationConfig',
     'GenerationResult',
     'SanTOKSLM',
+    # Phase 2 Transformer
+    'TinyTransformer',
+    'TransformerConfig',
+    'create_tiny_transformer',
+    # Phase 2 Decoder
+    'ConstrainedDecoder',
+    'DecoderConfig',
+    'TransformerConstrainedSLM',
+    'create_transformer_slm',
 ]
 
