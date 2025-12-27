@@ -40,6 +40,19 @@ from .slm_constrained_decoder import (
     create_transformer_slm,
 )
 
+from .training_data import (
+    TrainingSequence,
+    SanTOKDataGenerator,
+    create_training_data,
+    create_default_templates,
+)
+
+from .slm_trainer import (
+    SLMTrainer,
+    TrainingConfig,
+    create_trainer,
+)
+
 __all__ = [
     # Constraints
     'TokenConstraint',
@@ -60,5 +73,13 @@ __all__ = [
     'DecoderConfig',
     'TransformerConstrainedSLM',
     'create_transformer_slm',
+    # Phase 3 Training
+    'TrainingSequence',
+    'SanTOKDataGenerator',
+    'create_training_data',
+    'create_default_templates',
+    'SLMTrainer',
+    'TrainingConfig',
+    'create_trainer',
 ]
 
