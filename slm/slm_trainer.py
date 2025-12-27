@@ -1,11 +1,11 @@
 """
 SanTOK SLM Trainer
 
-Training loop for the tiny transformer.
+Training loop for the SanTOK Sequence Optimizer.
 Key principle: Loss computed ONLY over allowed tokens.
 
 This is sequence optimization, NOT fact learning.
-The transformer learns ORDERING patterns, nothing more.
+The sequence optimizer learns ORDERING patterns, nothing more.
 """
 
 from typing import List, Dict, Optional, Tuple
@@ -15,7 +15,7 @@ import random
 import json
 from pathlib import Path
 
-from .tiny_transformer import TinyTransformer, TransformerConfig
+from .santok_sequence_optimizer import SanTOKSequenceOptimizer, SanTOKSequenceConfig
 from .training_data import TrainingSequence, SanTOKDataGenerator
 
 
@@ -43,14 +43,14 @@ class SLMTrainer:
     """
     Trainer for SanTOK SLM.
     
-    This trains the transformer to predict next tokens
+    This trains the sequence optimizer to predict next tokens
     ONLY from allowed sets. Hallucination cannot occur
     even during training.
     """
     
     def __init__(
         self,
-        transformer: TinyTransformer,
+        transformer: SanTOKSequenceOptimizer,
         config: Optional[TrainingConfig] = None
     ):
         self.transformer = transformer
@@ -372,7 +372,7 @@ class SLMTrainer:
 
 
 def create_trainer(
-    transformer: Optional[TinyTransformer] = None,
+        transformer: Optional[SanTOKSequenceOptimizer] = None,
     vocab_size: int = 10000,
     d_model: int = 128,
     n_layers: int = 2,
@@ -388,17 +388,17 @@ def create_trainer(
         n_layers: Number of layers
         n_heads: Number of heads
     """
-    from .tiny_transformer import TinyTransformer, TransformerConfig
+    from .santok_sequence_optimizer import SanTOKSequenceOptimizer, SanTOKSequenceConfig
     
     if transformer is None:
-        config = TransformerConfig(
+        config = SanTOKSequenceConfig(
             vocab_size=vocab_size,
             d_model=d_model,
             n_layers=n_layers,
             n_heads=n_heads,
             d_ff=d_model * 4,
         )
-        transformer = TinyTransformer(config)
+        transformer = SanTOKSequenceOptimizer(config)
     
     return SLMTrainer(transformer)
 

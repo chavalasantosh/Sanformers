@@ -27,10 +27,10 @@ from .slm_generator import (
     SanTOKSLM,
 )
 
-from .tiny_transformer import (
-    TinyTransformer,
-    TransformerConfig,
-    create_tiny_transformer,
+from .santok_sequence_optimizer import (
+    SanTOKSequenceOptimizer,
+    SanTOKSequenceConfig,
+    create_santok_sequence_optimizer,
 )
 
 from .slm_constrained_decoder import (
@@ -64,10 +64,10 @@ __all__ = [
     'GenerationConfig',
     'GenerationResult',
     'SanTOKSLM',
-    # Phase 2 Transformer
-    'TinyTransformer',
-    'TransformerConfig',
-    'create_tiny_transformer',
+    # Phase 2 Sequence Optimizer
+    'SanTOKSequenceOptimizer',
+    'SanTOKSequenceConfig',
+    'create_santok_sequence_optimizer',
     # Phase 2 Decoder
     'ConstrainedDecoder',
     'DecoderConfig',

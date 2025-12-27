@@ -17,8 +17,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from santok_cognitive.slm import (
-    create_tiny_transformer,
-    TransformerConfig,
+    create_santok_sequence_optimizer,
+    SanTOKSequenceConfig,
 )
 from santok_cognitive.slm.training_data import (
     create_training_data,
@@ -99,8 +99,8 @@ def demo_training_loop():
         num_sequences=200  # Small for demo
     )
     
-    # Create transformer and trainer
-    transformer = create_tiny_transformer(
+    # Create sequence optimizer and trainer
+    transformer = create_santok_sequence_optimizer(
         vocab_size=5000,
         d_model=64,  # Very tiny for demo
         n_layers=2,

@@ -1,14 +1,14 @@
 """
 SanTOK Constrained Decoder
 
-Integrates the tiny transformer with SanTOK Cognitive constraints.
+Integrates the SanTOK Sequence Optimizer with SanTOK Cognitive constraints.
 
-Rule: Transformer proposes → SanTOK disposes
+Rule: Sequence Optimizer proposes → SanTOK Cognitive disposes
 
-The transformer generates scores, but SanTOK Cognitive decides
+The sequence optimizer generates scores, but SanTOK Cognitive decides
 which tokens are actually allowed. Disallowed tokens get zero probability.
 
-This makes hallucination structurally impossible even with a neural component.
+This makes hallucination structurally impossible even with a sequence component.
 """
 
 from dataclasses import dataclass
@@ -16,7 +16,7 @@ from typing import List, Dict, Set, Optional, Tuple
 import numpy as np
 import random
 
-from .tiny_transformer import TinyTransformer, TransformerConfig
+from .santok_sequence_optimizer import SanTOKSequenceOptimizer, SanTOKSequenceConfig
 from .slm_constraints import ConstraintEngine
 
 
@@ -39,10 +39,10 @@ class ConstrainedDecoder:
     """
     The constrained decoder.
     
-    This is where transformer scores meet SanTOK constraints.
+    This is where sequence optimizer scores meet SanTOK constraints.
     
     Flow:
-    1. Transformer generates scores for all tokens
+    1. Sequence Optimizer generates scores for all tokens
     2. SanTOK Cognitive filters to allowed tokens only
     3. Disallowed tokens get zero probability
     4. Sample from allowed set only
@@ -50,7 +50,7 @@ class ConstrainedDecoder:
     
     def __init__(
         self,
-        transformer: TinyTransformer,
+        transformer: SanTOKSequenceOptimizer,
         constraint_engine: ConstraintEngine
     ):
         self.transformer = transformer
@@ -292,10 +292,10 @@ class ConstrainedDecoder:
 
 class TransformerConstrainedSLM:
     """
-    Complete transformer-constrained SLM.
+    Complete SanTOK sequence-constrained SLM.
     
     This integrates:
-    - TinyTransformer (sequence optimization)
+    - SanTOKSequenceOptimizer (sequence optimization)
     - ConstraintEngine (fact grounding)
     - ConstrainedDecoder (integration layer)
     
@@ -308,7 +308,7 @@ class TransformerConstrainedSLM:
     
     def __init__(
         self,
-        transformer_config: Optional[TransformerConfig] = None
+        transformer_config: Optional[SanTOKSequenceConfig] = None
     ):
         # Import here to avoid circular import
         from .slm_constraints import ConstraintEngine
@@ -316,16 +316,16 @@ class TransformerConstrainedSLM:
         # Create constraint engine
         self.engine = ConstraintEngine()
         
-        # Create transformer
+        # Create sequence optimizer
         if transformer_config is None:
-            transformer_config = TransformerConfig(
+            transformer_config = SanTOKSequenceConfig(
                 vocab_size=10000,
                 d_model=128,
                 n_layers=2,
                 n_heads=4,
                 d_ff=512,
             )
-        self.transformer = TinyTransformer(transformer_config)
+        self.transformer = SanTOKSequenceOptimizer(transformer_config)
         
         # Create decoder
         self.decoder = ConstrainedDecoder(self.transformer, self.engine)
@@ -427,11 +427,11 @@ def create_transformer_slm(
     n_heads: int = 4
 ) -> TransformerConstrainedSLM:
     """
-    Factory function to create a transformer-constrained SLM.
+    Factory function to create a SanTOK sequence-constrained SLM.
     
     Defaults create a ~1M parameter model.
     """
-    config = TransformerConfig(
+    config = SanTOKSequenceConfig(
         vocab_size=vocab_size,
         d_model=d_model,
         n_layers=n_layers,

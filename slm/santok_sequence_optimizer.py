@@ -1,16 +1,16 @@
 """
-SanTOK Tiny Transformer
+SanTOK Sequence Optimizer
 
-A minimal transformer for SEQUENCE OPTIMIZATION ONLY.
+A SanTOK-native sequence ordering system.
 This is NOT intelligence - it only arranges approved tokens.
 
 Key design principles:
     - Weak by design (intelligence stays in SanTOK Cognitive)
     - Symbol IDs only (no raw text to prevent leakage)
-    - Transformer proposes → SanTOK disposes
-    - 2-4 attention blocks (minimal complexity)
+    - Sequence Optimizer proposes → SanTOK Cognitive disposes
+    - 2-4 pattern matching blocks (minimal complexity)
 
-NumPy only. No ML frameworks. 100% SanTOK.
+NumPy only. No external AI concepts. 100% SanTOK.
 """
 
 from dataclasses import dataclass
@@ -19,8 +19,8 @@ import numpy as np
 
 
 @dataclass
-class TransformerConfig:
-    """Configuration for tiny transformer."""
+class SanTOKSequenceConfig:
+    """Configuration for SanTOK Sequence Optimizer."""
     vocab_size: int = 10000      # Symbol vocabulary size
     d_model: int = 128           # Model dimension (tiny)
     n_layers: int = 2            # Number of attention blocks
@@ -34,11 +34,11 @@ class TransformerConfig:
         assert self.d_model % self.n_heads == 0, "d_model must be divisible by n_heads"
 
 
-class PositionalEncoding:
+class SanTOKPositionEncoder:
     """
-    Sinusoidal positional encoding.
+    SanTOK position encoding.
     
-    Adds position information to embeddings.
+    Adds position information to symbol embeddings.
     This is PURELY positional - no semantic meaning.
     """
     
@@ -70,9 +70,9 @@ class PositionalEncoding:
         return x + self.pe[:seq_len]
 
 
-class MultiHeadAttention:
+class SanTOKPatternMatcher:
     """
-    Multi-head self-attention.
+    SanTOK pattern matching.
     
     This learns LOCAL patterns (which tokens go together).
     It does NOT learn facts or reasoning.
@@ -142,11 +142,11 @@ class MultiHeadAttention:
         return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
 
 
-class FeedForward:
+class SanTOKProcessor:
     """
-    Feed-forward network.
+    SanTOK processing layer.
     
-    Simple two-layer MLP for local processing.
+    Simple two-layer processing for local token transformation.
     """
     
     def __init__(self, d_model: int, d_ff: int):
@@ -173,18 +173,18 @@ class FeedForward:
         return out
 
 
-class TransformerBlock:
+class SanTOKSequenceBlock:
     """
-    Single transformer block.
+    SanTOK sequence processing block.
     
-    Attention → Add & Norm → FeedForward → Add & Norm
+    Pattern Matching → Add & Norm → Processing → Add & Norm
     
     This learns LOCAL token ordering patterns.
     """
     
     def __init__(self, d_model: int, n_heads: int, d_ff: int):
-        self.attention = MultiHeadAttention(d_model, n_heads)
-        self.feed_forward = FeedForward(d_model, d_ff)
+        self.pattern_matcher = SanTOKPatternMatcher(d_model, n_heads)
+        self.processor = SanTOKProcessor(d_model, d_ff)
         
         # Layer normalization (simplified - just variance normalization)
         self.norm1_scale = np.ones(d_model, dtype=np.float32)
@@ -200,16 +200,16 @@ class TransformerBlock:
         Returns:
             Output, shape (seq_len, d_model)
         """
-        # Self-attention + residual
-        attn_out = self.attention.forward(x, mask)
-        x = x + attn_out
+        # Pattern matching + residual
+        pattern_out = self.pattern_matcher.forward(x, mask)
+        x = x + pattern_out
         
         # Layer norm 1 (simplified)
         x = self._layer_norm(x, self.norm1_scale)
         
-        # Feed-forward + residual
-        ff_out = self.feed_forward.forward(x)
-        x = x + ff_out
+        # Processing + residual
+        proc_out = self.processor.forward(x)
+        x = x + proc_out
         
         # Layer norm 2
         x = self._layer_norm(x, self.norm2_scale)
@@ -225,9 +225,9 @@ class TransformerBlock:
         return x_norm * scale
 
 
-class TinyTransformer:
+class SanTOKSequenceOptimizer:
     """
-    The tiny transformer.
+    SanTOK Sequence Optimizer.
     
     This is WEAK BY DESIGN. It only learns:
     - Which tokens appear together (local patterns)
@@ -242,19 +242,19 @@ class TinyTransformer:
     Intelligence stays in SanTOK Cognitive.
     """
     
-    def __init__(self, config: TransformerConfig):
+    def __init__(self, config: SanTOKSequenceConfig):
         self.config = config
         
         # Embedding layer (symbol IDs → vectors)
         # This is PURELY a lookup - no semantic meaning
         self.embedding = np.random.randn(config.vocab_size, config.d_model).astype(np.float32) * 0.02
         
-        # Positional encoding
-        self.pos_encoding = PositionalEncoding(config.d_model, config.max_seq_len)
+        # Position encoding
+        self.pos_encoder = SanTOKPositionEncoder(config.d_model, config.max_seq_len)
         
-        # Transformer blocks
+        # Sequence processing blocks
         self.blocks = [
-            TransformerBlock(config.d_model, config.n_heads, config.d_ff)
+            SanTOKSequenceBlock(config.d_model, config.n_heads, config.d_ff)
             for _ in range(config.n_layers)
         ]
         
@@ -313,10 +313,10 @@ class TinyTransformer:
         # Embedding lookup
         embedded = self.embedding[symbol_ids]  # (seq_len, d_model)
         
-        # Add positional encoding
-        embedded = self.pos_encoding(embedded)
+        # Add position encoding
+        embedded = self.pos_encoder(embedded)
         
-        # Pass through transformer blocks
+        # Pass through sequence blocks
         x = embedded
         for block in self.blocks:
             x = block.forward(x)
@@ -378,24 +378,24 @@ class TinyTransformer:
         return count
 
 
-def create_tiny_transformer(
+def create_santok_sequence_optimizer(
     vocab_size: int = 10000,
     d_model: int = 128,
     n_layers: int = 2,
     n_heads: int = 4,
     d_ff: int = 512
-) -> TinyTransformer:
+) -> SanTOKSequenceOptimizer:
     """
-    Factory function to create a tiny transformer.
+    Factory function to create a SanTOK Sequence Optimizer.
     
     Defaults create a ~1M parameter model.
     """
-    config = TransformerConfig(
+    config = SanTOKSequenceConfig(
         vocab_size=vocab_size,
         d_model=d_model,
         n_layers=n_layers,
         n_heads=n_heads,
         d_ff=d_ff,
     )
-    return TinyTransformer(config)
+    return SanTOKSequenceOptimizer(config)
 

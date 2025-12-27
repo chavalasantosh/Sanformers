@@ -22,8 +22,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from santok_cognitive.slm import (
     TransformerConstrainedSLM,
     create_transformer_slm,
-    TinyTransformer,
-    TransformerConfig,
+    SanTOKSequenceOptimizer,
+    SanTOKSequenceConfig,
+    create_santok_sequence_optimizer,
 )
 
 
@@ -203,9 +204,9 @@ Flow:
     SanTOK Cognitive → Symbols → Symbol IDs → Transformer → Scores → Constraints → Text
     """)
     
-    # Create transformer
-    config = TransformerConfig(vocab_size=1000, d_model=64)
-    transformer = TinyTransformer(config)
+    # Create sequence optimizer
+    config = SanTOKSequenceConfig(vocab_size=1000, d_model=64)
+    transformer = SanTOKSequenceOptimizer(config)
     
     # Set vocabulary
     symbols = ["python", "programming", "language", "guido", "van", "rossum"]
