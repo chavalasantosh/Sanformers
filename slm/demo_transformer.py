@@ -20,8 +20,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from santok_cognitive.slm import (
-    TransformerConstrainedSLM,
-    create_transformer_slm,
+    SanTOKConstrainedSLM,
+    create_santok_constrained_slm,
     SanTOKSequenceOptimizer,
     SanTOKSequenceConfig,
     create_santok_sequence_optimizer,
@@ -35,7 +35,7 @@ def demo_transformer_basic():
     print("=" * 60)
     
     # Create SLM
-    slm = create_transformer_slm(
+    slm = create_santok_constrained_slm(
         vocab_size=5000,
         d_model=64,  # Very tiny
         n_layers=2,
@@ -85,7 +85,7 @@ def demo_weak_by_design():
     print("=" * 60)
     
     # Create SLM with minimal transformer
-    slm = create_transformer_slm(
+    slm = create_santok_constrained_slm(
         d_model=32,  # Tiny
         n_layers=1,  # Single layer
         n_heads=2,
@@ -142,7 +142,7 @@ def demo_transformer_proposes_santok_disposes():
     print("=" * 60)
     
     # Create SLM
-    slm = create_transformer_slm(d_model=64, n_layers=2)
+    slm = create_santok_constrained_slm(d_model=64, n_layers=2)
     
     facts = [
         "Machine learning is a subset of artificial intelligence",

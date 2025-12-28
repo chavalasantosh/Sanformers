@@ -36,8 +36,8 @@ from .santok_sequence_optimizer import (
 from .slm_constrained_decoder import (
     ConstrainedDecoder,
     DecoderConfig,
-    TransformerConstrainedSLM,
-    create_transformer_slm,
+    SanTOKConstrainedSLM,
+    create_santok_constrained_slm,
 )
 
 from .training_data import (
@@ -71,8 +71,8 @@ __all__ = [
     # Phase 2 Decoder
     'ConstrainedDecoder',
     'DecoderConfig',
-    'TransformerConstrainedSLM',
-    'create_transformer_slm',
+    'SanTOKConstrainedSLM',
+    'create_santok_constrained_slm',
     # Phase 3 Training
     'TrainingSequence',
     'SanTOKDataGenerator',

@@ -50,10 +50,10 @@ class ConstrainedDecoder:
     
     def __init__(
         self,
-        transformer: SanTOKSequenceOptimizer,
+        sequence_optimizer: SanTOKSequenceOptimizer,
         constraint_engine: ConstraintEngine
     ):
-        self.transformer = transformer
+        self.sequence_optimizer = sequence_optimizer
         self.engine = constraint_engine
         self.config = DecoderConfig()
         self.rng = random.Random()
@@ -73,7 +73,7 @@ class ConstrainedDecoder:
             
             # Create mapping
             symbol_to_id = {token: i for i, token in enumerate(sorted(all_tokens))}
-            self.transformer.set_vocabulary(symbol_to_id)
+            self.sequence_optimizer.set_vocabulary(symbol_to_id)
             
             # Cache for lookup
             self.all_symbols = sorted(all_tokens)
@@ -100,11 +100,11 @@ class ConstrainedDecoder:
             allowed_tokens = self.engine.get_allowed_tokens()
         
         # Convert sequence to IDs
-        sequence_ids = self.transformer.encode_symbols(current_sequence)
+        sequence_ids = self.sequence_optimizer.encode_symbols(current_sequence)
         
         # Convert allowed tokens to candidate IDs
         candidate_symbols = [s for s in self.all_symbols if s in allowed_tokens]
-        candidate_ids = self.transformer.encode_symbols(candidate_symbols)
+        candidate_ids = self.sequence_optimizer.encode_symbols(candidate_symbols)
         
         if not candidate_ids:
             # No allowed tokens - return a structural token if available
@@ -114,8 +114,8 @@ class ConstrainedDecoder:
                     return struct, {'reason': 'fallback_structural'}
             return '.', {'reason': 'fallback_period'}
         
-        # Get transformer scores for candidates
-        candidate_scores = self.transformer.get_scores(sequence_ids, candidate_ids)
+        # Get sequence optimizer scores for candidates
+        candidate_scores = self.sequence_optimizer.get_scores(sequence_ids, candidate_ids)
         
         # Apply repetition penalty
         candidate_scores = self._apply_repetition_penalty(
@@ -290,7 +290,7 @@ class ConstrainedDecoder:
                 setattr(self.config, key, value)
 
 
-class TransformerConstrainedSLM:
+class SanTOKConstrainedSLM:
     """
     Complete SanTOK sequence-constrained SLM.
     
@@ -300,7 +300,7 @@ class TransformerConstrainedSLM:
     - ConstrainedDecoder (integration layer)
     
     Usage:
-        slm = TransformerConstrainedSLM()
+        slm = SanTOKConstrainedSLM()
         slm.load_knowledge(facts, reasoning_path)
         slm.set_vocabulary_from_facts()
         result = slm.generate("What is Python?")
@@ -325,10 +325,10 @@ class TransformerConstrainedSLM:
                 n_heads=4,
                 d_ff=512,
             )
-        self.transformer = SanTOKSequenceOptimizer(transformer_config)
+        self.sequence_optimizer = SanTOKSequenceOptimizer(transformer_config)
         
         # Create decoder
-        self.decoder = ConstrainedDecoder(self.transformer, self.engine)
+        self.decoder = ConstrainedDecoder(self.sequence_optimizer, self.engine)
         
         # Knowledge
         self.facts: List[str] = []
@@ -408,24 +408,24 @@ class TransformerConstrainedSLM:
     
     def get_stats(self) -> Dict:
         """Get statistics."""
-        transformer_params = self.transformer.count_parameters()
+        optimizer_params = self.sequence_optimizer.count_parameters()
         constraint_stats = self.engine.get_stats()
         
         return {
-            'transformer_parameters': transformer_params,
-            'transformer_size_mb': transformer_params * 4 / (1024 * 1024),  # Assuming float32
+            'optimizer_parameters': optimizer_params,
+            'optimizer_size_mb': optimizer_params * 4 / (1024 * 1024),  # Assuming float32
             'constraint_stats': constraint_stats,
             'facts_loaded': len(self.facts),
             'vocab_size': len(self.decoder.all_symbols),
         }
 
 
-def create_transformer_slm(
+def create_santok_constrained_slm(
     vocab_size: int = 10000,
     d_model: int = 128,
     n_layers: int = 2,
     n_heads: int = 4
-) -> TransformerConstrainedSLM:
+) -> SanTOKConstrainedSLM:
     """
     Factory function to create a SanTOK sequence-constrained SLM.
     
@@ -438,5 +438,5 @@ def create_transformer_slm(
         n_heads=n_heads,
         d_ff=d_model * 4,
     )
-    return TransformerConstrainedSLM(config)
+    return SanTOKConstrainedSLM(config)
 

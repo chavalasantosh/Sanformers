@@ -31,7 +31,7 @@ SanTOK SLM (Small Language Model) is a **deterministic, constraint-driven text g
 
 ```
 Traditional LLM:
-    Input → Neural Network → Probabilistic Output → (May hallucinate)
+    Input → Statistical Model → Probabilistic Output → (May hallucinate)
 
 SanTOK SLM:
     Input → SanTOK Cognitive (THINKS) → Constraints → Sequence Optimizer (ORDERS) → Constrained Output → (Cannot hallucinate)
@@ -1210,10 +1210,10 @@ training_stats = {
 
 ```python
 # Complete SanTOK SLM setup
-from santok_cognitive.slm import TransformerConstrainedSLM
+from santok_cognitive.slm import SanTOKConstrainedSLM
 
 # Create SLM
-slm = TransformerConstrainedSLM()
+slm = SanTOKConstrainedSLM()
 
 # Load knowledge from SanTOK Cognitive
 facts = unified_memory.get_facts(query)
